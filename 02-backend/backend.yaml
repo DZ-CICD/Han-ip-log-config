@@ -1,0 +1,32 @@
+# Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwt-secret
+  namespace: backend-ns
+type: Opaque
+data:
+  JWT_SECRET_KEY: azhzcGFzcyM=
+---
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: backend-ns
+data:
+  GUESTBOOK_DB_ADDR: "mongodb://mongodb-0.mongo-svc.db-ns.svc.cluster.local:27017/guestbook?replicaSet=rs0"
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: backend-ns
+spec:
+  selector:
+    app: backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
