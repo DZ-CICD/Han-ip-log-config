@@ -1,0 +1,82 @@
+# backend-tier.yaml: Backend Application (backend-ns) 관련 리소스
+
+# 1. 네임스페이스
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backend-ns
+  labels:
+    istio-injection: enabled # Istio 활성화 필수
+---
+# 2. Secret - JWT
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwt-secret
+  namespace: backend-ns
+type: Opaque
+data:
+  JWT_SECRET_KEY: azhzcGFzcyM=
+---
+# 5. ConfigMaps (Backend)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: backend-ns
+data:
+  # MongoDB 주소 (db-tier의 headless 서비스 사용)
+  GUESTBOOK_DB_ADDR: "mongodb://mongodb-0.mongo-svc.db-ns.svc.cluster.local:27017/guestbook?replicaSet=rs0"
+---
+# 7. Services (Backend)
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: backend-ns
+spec:
+  selector:
+    app: backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+---
+# 10. Deployments (Backend)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: backend-ns
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox:1.36
+        command: ['sh', '-c', 'until nc -z -w 2 mongodb-0.mongo-svc.db-ns 27017; do echo "Waiting for MongoDB..."; sleep 2; done;']
+      containers:
+      - name: backend
+        image: 192.168.0.183/backend/backend:1.2
+        ports:
+        - containerPort: 8000
+        env:
+        - name: PORT
+          value: "8000"
+        - name: GUESTBOOK_DB_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: GUESTBOOK_DB_ADDR
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: JWT_SECRET_KEY

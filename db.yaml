@@ -1,4 +1,14 @@
-# Service
+# db-tier.yaml: MongoDB Database (db-ns) 관련 리소스
+
+# 1. 네임스페이스
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: db-ns
+  labels:
+    istio-injection: enabled # Istio 활성화 필수
+---
+# 6. Services (DB) - Headless Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,7 +22,7 @@ spec:
   selector:
     app: db
 ---
-# StatefulSet
+# 8. MongoDB StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
