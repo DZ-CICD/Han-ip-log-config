@@ -64,7 +64,7 @@ spec:
         command: ['sh', '-c', 'until nc -z -w 2 mongodb-0.mongo-svc.db-ns 27017; do echo "Waiting for MongoDB..."; sleep 2; done;']
       containers:
       - name: backend
-        image: harbor.local.net/haniplog/haniplog-backend:v1.17
+        image: harbor.local.net/haniplog/haniplog-backend:v1.18
         ports:
         - containerPort: 8000
         env:
