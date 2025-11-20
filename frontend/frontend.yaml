@@ -92,6 +92,20 @@ spec:
   gateways:
   - book-gateway
   http:
+
+
+  - match:
+    - uri:
+        exact: /login
+    - uri:
+        exact: /register
+    route:
+    - destination:
+        host: backend-svc.backend-ns.svc.cluster.local
+        port:
+          number: 8000
+
+
   # [1] API 요청: /api/ 경로로 오는 요청은 백엔드로 전달
   - match:
     - uri:
