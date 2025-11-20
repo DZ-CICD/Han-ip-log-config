@@ -51,7 +51,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: frontend
-        image: harbor.local.net/haniplog/haniplog-frontend:v1.17
+        image: harbor.local.net/haniplog/haniplog-frontend:v1.36
         ports:
         - containerPort: 8000
         env:
